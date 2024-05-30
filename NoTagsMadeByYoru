@@ -1,0 +1,86 @@
+game.StarterGui:SetCore("ChatMakeSystemMessage", {
+    Text = "Made by Yoru",
+    Color = Color3.fromRGB(255, 33, 36),
+    Font = Enum.Font.SourceSansBold,
+    TextSize = 20,})
+game.StarterGui:SetCore("ChatMakeSystemMessage", {
+    Text = "Discord acc : 8.x0",
+    Color = Color3.fromRGB(255, 33, 36),
+    Font = Enum.Font.SourceSansBold,
+    TextSize = 13,})
+
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local players = game:GetService("Players")
+local chatService = game:GetService("Chat")
+
+repeat task.wait() until game:IsLoaded()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/AnthonyIsntHere/anthonysrepository/main/scripts/AntiChatLogger.lua", true))()
+
+local custom_chars = {
+    [" "] = "￰",
+    ["i"] = "і",
+    ["e"] = "е",
+    ["g"] = "g",
+    ["c"] = "с",
+    ["o"] = "о",
+    ["p"] = "р",
+    ["s"] = "ѕ",
+    ["u"] = "u",
+    ["I"] = "Ӏ",
+    ["E"] = "Е",
+    ["G"] = "ꓖ",
+    ["C"] = "С",
+    ["O"] = "О",
+    ["P"] = "Р",
+    ["S"] = "Ѕ",
+    ["U"] = "𐓎"
+}
+
+local default = " ိ"
+
+local player = players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.ResetOnSpawn = false  
+ScreenGui.Parent = playerGui
+
+local textBox = Instance.new("TextBox")
+textBox.Size = UDim2.new(0.1, 0, 0.05, 0)  
+textBox.Position = UDim2.new(1, -5, 0.4, 0)  
+textBox.AnchorPoint = Vector2.new(1, 0.5)  
+textBox.Parent = ScreenGui
+
+textBox.BackgroundColor3 = Color3.fromRGB(35, 35, 35)  
+textBox.TextColor3 = Color3.fromRGB(255, 255, 255)  
+textBox.BorderSizePixel = 0  
+textBox.Font = Enum.Font.SourceSans  
+textBox.TextSize = 14  -- Set text size
+
+textBox.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        local message = textBox.Text
+        for i, v in pairs(custom_chars) do
+            message = string.gsub(message, i, v)
+        end
+        message = default .. message  
+
+        local args = {message, "All"}
+        ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(unpack(args))
+        textBox.Text = ""  
+    end
+end)
+
+local old
+old = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
+    local method = getnamecallmethod()
+    local args = {...}
+
+    if method == "FireServer" and self.Name == "SayMessageRequest" and #args == 2 and not checkcaller() then
+        if args[1]:find(default) then
+            return old(self, unpack(args))
+        end
+    end
+    return old(self, ...)
+end))
